@@ -1,0 +1,25 @@
+*{box-sizing:border-box}
+body{font-family:system-ui,-apple-system,Segoe UI,Tahoma; background:#fafafa; color:#222; margin:0}
+.app-header .bar{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#8b0000;color:#fff}
+.brand{display:flex;align-items:center;gap:10px}
+.brand img{width:48px;height:48px;border-radius:8px;object-fit:cover}
+.tabs{display:flex;gap:4px;background:#a31616;padding:6px 10px}
+.tabs button{background:transparent;color:#fff;border:none;padding:8px 10px;border-radius:8px;cursor:pointer}
+.tabs button.active,.tabs button:hover{background:rgba(255,255,255,.15)}
+.card{background:#fff;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.08);padding:14px;margin:12px 0}
+.row{display:flex;gap:6px;align-items:center}
+.row.end{justify-content:flex-end}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px}
+input,select{width:100%;padding:9px;border:1px solid #ddd;border-radius:10px;background:#fff}
+.btn{background:#b71c1c;border:none;color:#fff;padding:9px 12px;border-radius:10px;cursor:pointer}
+.btn-light{background:#eee;color:#333}
+.btn-primary{background:#007bff}
+.tbl{width:100%;border-collapse:collapse;margin-top:8px}
+.tbl th,.tbl td{border-bottom:1px solid #eee;padding:8px;text-align:right}
+.auth-screen{display:flex;align-items:center;justify-content:center;height:100vh}
+.login-card{width:min(420px,96%)}.logo-wrap{text-align:center;margin-bottom:8px}
+.msg{margin-top:6px;color:#444}
+.foot{padding:12px;text-align:center;color:#777}
+@media(max-width:900px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}

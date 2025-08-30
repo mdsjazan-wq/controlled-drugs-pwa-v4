@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="theme-color" content="#B71C1C"/>
+  <title>إدارة الأدوية المخدرة - جازان (v4)</title>
+  <link rel="manifest" href="manifest.webmanifest"/>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+
+<header id="app-header" class="app-header" style="display:none">
+  <div class="bar">
+    <div class="brand">
+      <img src="logo.jpg" alt="SRCA Logo" onerror="this.style.display='none'"/>
+      <div>
+        <h1>إدارة الأدوية المخدرة - جازان</h1>
+        <small>نسخة 4 — صلاحيات + نظام طلبات</small>
+      </div>
+    </div>
+    <div class="actions">
+      <span id="whoami"></span>
+      <button id="btn-logout" class="btn btn-light">تسجيل الخروج</button>
+    </div>
+  </div>
+  <nav class="tabs">
+    <button data-tab="dashboard" class="active">لوحة التحكم</button>
+    <button data-tab="requests">الطلبات</button>
+    <button data-tab="reports">التقارير</button>
+    <button data-tab="settings">إعدادات</button>
+  </nav>
+</header>
+
+<!-- شاشة الدخول -->
+<section id="auth-screen" class="auth-screen">
+  <div class="card login-card">
+    <div class="logo-wrap">
+      <img src="logo.jpg" alt="SRCA Logo" onerror="this.style.display='none'"/>
+    </div>
+    <h2>إدارة الأدوية المخدرة - جازان</h2>
+    <label>البريد الإلكتروني</label>
+    <input id="login-email" type="email" placeholder="you@example.com"/>
+    <label>كلمة المرور</label>
+    <input id="login-password" type="password" placeholder="••••••••"/>
+    <div class="row">
+      <button id="btn-login" class="btn btn-primary">دخول</button>
+      <button id="btn-signup" class="btn btn-light">مستخدم جديد</button>
+    </div>
+    <div id="login-msg" class="msg"></div>
+  </div>
+</section>
+
+<!-- المحتوى الرئيسي -->
+<main id="app-main" style="display:none">
+
+  <!-- تبويب: لوحة التحكم -->
+  <section id="tab-dashboard" class="tab">
+    <div class="grid-2">
+      <div class="card">
+        <h3>حالتك</h3>
+        <p>الاسم: <b id="profile-name">-</b></p>
+        <p>الدور: <b id="profile-role">-</b></p>
+        <p>مركزك الافتراضي: <b id="profile-center">-</b></p>
+      </div>
+      <div class="card">
+        <h3>ملخص سريع</h3>
+        <div id="quick-stats">—</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- تبويب: الطلبات -->
+  <section id="tab-requests" class="tab" style="display:none">
+    <div id="role-center" style="display:none">
+      <div class="card">
+        <h3>إنشاء طلب جديد (مستخدم مركز)</h3>
+        <div class="grid-3">
+          <div>
+            <label>نوع الطلب</label>
+            <select id="rq-type">
+              <option value="issue">صرف</option>
+              <option value="return_empty">إرجاع فارغ</option>
+              <option value="return_expired">إرجاع منتهي</option>
+            </select>
+          </div>
+          <div>
+            <label>ملاحظة</label>
+            <input id="rq-note" placeholder="اختياري"/>
+          </div>
+          <div class="row end">
+            <button id="btn-create-draft" class="btn">حفظ كمسودة</button>
+          </div>
+        </div>
+
+        <div id="rq-editor" style="display:none; margin-top:12px">
+          <div class="grid-3">
+            <div>
+              <label>الصنف</label>
+              <select id="rq-item"></select>
+            </div>
+            <div>
+              <label>الكمية</label>
+              <input id="rq-qty" type="number" value="1"/>
+            </div>
+            <div class="row end">
+              <button id="btn-add-line" class="btn">إضافة بند</button>
+            </div>
+          </div>
+          <table class="tbl" id="rq-lines">
+            <thead><tr><th>الصنف</th><th>الكمية</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <div class="row end" style="gap:8px">
+            <button id="btn-submit-request" class="btn btn-primary">رفع الطلب</button>
+            <button id="btn-cancel-draft" class="btn btn-light">إلغاء المسودة</button>
+          </div>
+          <div id="rq-msg" class="msg"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>طلباتي</h3>
+        <table class="tbl" id="my-requests">
+          <thead><tr><th>#</th><th>النوع</th><th>الحالة</th><th>تاريخ</th><th>ملاحظة</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="role-store" style="display:none">
+      <div class="card">
+        <h3>وارد للمراجعة (Submitted)</h3>
+        <table class="tbl" id="incoming-requests">
+          <thead><tr><th>#</th><th>المركز</th><th>النوع</th><th>ملاحظة</th><th>فتح</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>مراجعة طلب</h3>
+        <div class="row">
+          <input id="review-id" placeholder="رقم الطلب"/>
+          <button id="btn-load-review" class="btn">عرض</button>
+        </div>
+        <div id="review-wrap" style="display:none">
+          <p>الطلب #: <b id="rv-id"></b> | الحالة: <b id="rv-status"></b> | النوع: <b id="rv-type"></b> | المركز: <b id="rv-center"></b></p>
+          <table class="tbl" id="rv-lines">
+            <thead><tr><th>الصنف</th><th>الكمية</th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <div class="row" style="gap:8px">
+            <button id="btn-approve" class="btn btn-primary">اعتماد</button>
+            <button id="btn-reject" class="btn btn-light">رفض</button>
+            <button id="btn-fulfill" class="btn">تنفيذ (ترحيل)</button>
+          </div>
+          <div id="review-msg" class="msg"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- تبويب: التقارير -->
+  <section id="tab-reports" class="tab" style="display:none">
+    <div class="card">
+      <h3>التقارير</h3>
+      <div class="row no-print" style="gap:8px">
+        <button class="btn" id="btn-pdf">تصدير PDF</button>
+        <button class="btn" id="btn-csv">تصدير CSV</button>
+        <button class="btn" id="btn-xlsx">تصدير Excel (XLSX)</button>
+      </div>
+      <div id="reports-area" style="margin-top:10px">
+        <p>سيتم هنا عرض جداول الملخصات…</p>
+        <table class="tbl" id="dummy-report">
+          <thead><tr><th>الجهة</th><th>الصنف</th><th>الرصيد</th></tr></thead>
+          <tbody><tr><td>مثال</td><td>مورفين</td><td>100</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- تبويب: الإعدادات -->
+  <section id="tab-settings" class="tab" style="display:none">
+    <div class="card">
+      <h3>إدارة المستخدمين (لـ admin فقط)</h3>
+      <div class="grid-4">
+        <input id="usr-email" placeholder="البريد"/>
+        <input id="usr-name" placeholder="الاسم"/>
+        <select id="usr-role">
+          <option value="center_user">center_user</option>
+          <option value="storekeeper">storekeeper</option>
+          <option value="auditor">auditor</option>
+          <option value="admin">admin</option>
+        </select>
+        <select id="usr-center"><option value="">— مركز افتراضي (لـ center_user)</option></select>
+      </div>
+      <div class="row end" style="margin-top:8px">
+        <button id="btn-set-role" class="btn">حفظ الدور</button>
+      </div>
+      <div id="users-msg" class="msg"></div>
+    </div>
+
+    <div class="card">
+      <h3>مفاتيح الاتصال</h3>
+      <p>تحكّم بالمفاتيح من <code>config.js</code>. لا ترفع المفاتيح الحقيقية علنًا.</p>
+    </div>
+  </section>
+
+  <footer class="foot">© 2025 — جازان | شعار الهيئة لأغراض تعريفية</footer>
+</main>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.19.3/dist/xlsx.full.min.js"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js'));
+  }
+</script>
+</body>
+</html>
